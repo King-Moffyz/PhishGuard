@@ -1,0 +1,84 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: phishdetect
+      POSTGRES_PASSWORD: phishdetect
+      POSTGRES_DB: phishdetect
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U phishdetect"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7.0-alpine
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/app.Dockerfile
+      target: backend
+    environment:
+      DATABASE_URL: postgresql+psycopg2://phishdetect:phishdetect@postgres:5432/phishdetect
+      REDIS_URL: redis://redis:6379/0
+      MAX_PROCESSING_LATENCY_MS: "150"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/model_artifacts:/app/model_artifacts
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/app.Dockerfile
+      target: worker
+    environment:
+      DATABASE_URL: postgresql+psycopg2://phishdetect:phishdetect@postgres:5432/phishdetect
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - ./backend/model_artifacts:/app/model_artifacts
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      replicas: 2
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+      # Vite bakes these into the static bundle at build time — see frontend.Dockerfile —
+      # so they must be build args, not a runtime `environment:` block.
+      args:
+        VITE_API_BASE_URL: http://localhost:8000
+        VITE_DEFAULT_ORG_ID: ${VITE_DEFAULT_ORG_ID:-11111111-1111-1111-1111-111111111111}
+        VITE_DEFAULT_ACCOUNT_ID: ${VITE_DEFAULT_ACCOUNT_ID:-22222222-2222-2222-2222-222222222222}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

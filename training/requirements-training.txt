@@ -1,0 +1,18 @@
+# Training-only dependencies. Installed on the host (CPU), separate from the
+# runtime containers, since training is a one-off/occasional step, not a service.
+# torch is installed separately from the CPU wheel index:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+pandas==2.2.0
+scikit-learn==1.4.0
+xgboost==2.0.3
+transformers==4.41.1
+shap==0.45.1
+joblib==1.4.2
+numpy
+tldextract==5.1.2
+dnspython==2.6.1
+python-whois==0.9.4
+beautifulsoup4==4.12.3
+sqlalchemy==2.0.30
+tqdm
+matplotlib

@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 460" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="1300" height="460" fill="#0f172a"/>
+  <text x="650" y="34" text-anchor="middle" fill="#e2e8f0" font-size="20" font-weight="700">ML Feature &amp; Detection Pipeline (app.ml.pipeline → app.ml.detection_engine)</text>
+
+  <!-- stage boxes -->
+  <g font-size="12">
+    <rect x="30" y="80" width="170" height="110" rx="8" fill="#1e293b" stroke="#475569"/>
+    <text x="115" y="102" text-anchor="middle" fill="#e2e8f0" font-weight="700">1. Clean</text>
+    <text x="115" y="122" text-anchor="middle" fill="#94a3b8">MIME parse,</text>
+    <text x="115" y="138" text-anchor="middle" fill="#94a3b8">UTF-8 normalize,</text>
+    <text x="115" y="154" text-anchor="middle" fill="#94a3b8">dedup (body_md5)</text>
+
+    <rect x="230" y="80" width="180" height="110" rx="8" fill="#164e63" stroke="#22d3ee"/>
+    <text x="320" y="102" text-anchor="middle" fill="#e2e8f0" font-weight="700">2. Header (18d)</text>
+    <text x="320" y="122" text-anchor="middle" fill="#a5f3fc">SPF/DKIM/DMARC,</text>
+    <text x="320" y="138" text-anchor="middle" fill="#a5f3fc">reply-to mismatch,</text>
+    <text x="320" y="154" text-anchor="middle" fill="#a5f3fc">domain age, hops</text>
+
+    <rect x="440" y="80" width="200" height="110" rx="8" fill="#3b0764" stroke="#a855f7"/>
+    <text x="540" y="102" text-anchor="middle" fill="#e2e8f0" font-weight="700">3. Lexical+BERT</text>
+    <text x="540" y="122" text-anchor="middle" fill="#e9d5ff">25 lexical dims</text>
+    <text x="540" y="138" text-anchor="middle" fill="#e9d5ff">(urgency, brand kw)</text>
+    <text x="540" y="154" text-anchor="middle" fill="#e9d5ff">+ 768-dim BERT CLS</text>
+
+    <rect x="670" y="80" width="200" height="110" rx="8" fill="#78350f" stroke="#fbbf24"/>
+    <text x="770" y="102" text-anchor="middle" fill="#e2e8f0" font-weight="700">4. URL structure/intel</text>
+    <text x="770" y="122" text-anchor="middle" fill="#fde68a">20 lexical + 12 intel</text>
+    <text x="770" y="138" text-anchor="middle" fill="#fde68a">WHOIS age, DNS/MX,</text>
+    <text x="770" y="154" text-anchor="middle" fill="#fde68a">brand Levenshtein dist</text>
+
+    <rect x="900" y="80" width="200" height="110" rx="8" fill="#134e4a" stroke="#2dd4bf"/>
+    <text x="1000" y="102" text-anchor="middle" fill="#e2e8f0" font-weight="700">FeatureBundle</text>
+    <text x="1000" y="122" text-anchor="middle" fill="#99f6e4">tabular_vector</text>
+    <text x="1000" y="138" text-anchor="middle" fill="#99f6e4">(75 dims, max/mean</text>
+    <text x="1000" y="154" text-anchor="middle" fill="#99f6e4">pooled across URLs)</text>
+  </g>
+
+  <!-- arrows stage 1 -->
+  <defs>
+    <marker id="a2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+  <line x1="200" y1="135" x2="230" y2="135" stroke="#94a3b8" stroke-width="2" marker-end="url(#a2)"/>
+  <line x1="410" y1="135" x2="440" y2="135" stroke="#94a3b8" stroke-width="2" marker-end="url(#a2)"/>
+  <line x1="640" y1="135" x2="670" y2="135" stroke="#94a3b8" stroke-width="2" marker-end="url(#a2)"/>
+  <line x1="870" y1="135" x2="900" y2="135" stroke="#94a3b8" stroke-width="2" marker-end="url(#a2)"/>
+
+  <!-- Level boxes -->
+  <rect x="30" y="240" width="230" height="80" rx="8" fill="#1e3a8a" stroke="#60a5fa"/>
+  <text x="145" y="264" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700">L1 Supervised</text>
+  <text x="145" y="284" text-anchor="middle" fill="#bfdbfe" font-size="11">RandomForest (500 trees)</text>
+  <text x="145" y="300" text-anchor="middle" fill="#bfdbfe" font-size="11">XGBoost (multi:softprob)</text>
+
+  <rect x="290" y="240" width="230" height="80" rx="8" fill="#3b0764" stroke="#a855f7"/>
+  <text x="405" y="264" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700">L2 Semantic</text>
+  <text x="405" y="284" text-anchor="middle" fill="#e9d5ff" font-size="11">BertPhishingClassifierHead</text>
+  <text x="405" y="300" text-anchor="middle" fill="#e9d5ff" font-size="11">768→256→64→14 classes</text>
+
+  <rect x="550" y="240" width="230" height="80" rx="8" fill="#7f1d1d" stroke="#f87171"/>
+  <text x="665" y="264" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700">L3 Unsupervised</text>
+  <text x="665" y="284" text-anchor="middle" fill="#fecaca" font-size="11">IsolationForest (200 est.)</text>
+  <text x="665" y="300" text-anchor="middle" fill="#fecaca" font-size="11">Stacked Denoising Autoencoder</text>
+
+  <rect x="810" y="240" width="230" height="80" rx="8" fill="#064e3b" stroke="#34d399"/>
+  <text x="925" y="264" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700">L4 Meta-Learner</text>
+  <text x="925" y="284" text-anchor="middle" fill="#a7f3d0" font-size="11">Logistic Regression stacking</text>
+  <text x="925" y="300" text-anchor="middle" fill="#a7f3d0" font-size="11">5 sub-model probabilities</text>
+
+  <rect x="1070" y="240" width="200" height="80" rx="8" fill="#581c87" stroke="#c084fc"/>
+  <text x="1170" y="264" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700">Explainability</text>
+  <text x="1170" y="284" text-anchor="middle" fill="#e9d5ff" font-size="11">SHAP TreeExplainer</text>
+  <text x="1170" y="300" text-anchor="middle" fill="#e9d5ff" font-size="11">→ NL narrative summary</text>
+
+  <line x1="1000" y1="190" x2="145" y2="240" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a2)"/>
+  <line x1="1000" y1="190" x2="405" y2="240" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a2)"/>
+  <line x1="1000" y1="190" x2="665" y2="240" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a2)"/>
+  <line x1="260" y1="280" x2="810" y2="280" stroke="#475569" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="520" y1="280" x2="810" y2="280" stroke="#475569" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="780" y1="280" x2="810" y2="280" stroke="#94a3b8" stroke-width="2" marker-end="url(#a2)"/>
+  <line x1="1040" y1="280" x2="1070" y2="280" stroke="#94a3b8" stroke-width="2" marker-end="url(#a2)"/>
+
+  <!-- output -->
+  <rect x="470" y="380" width="360" height="60" rx="8" fill="#111827" stroke="#f59e0b"/>
+  <text x="650" y="405" text-anchor="middle" fill="#fde68a" font-size="13" font-weight="700">DetectionResult</text>
+  <text x="650" y="424" text-anchor="middle" fill="#fcd34d" font-size="11">category · severity · meta_confidence_score · shap_explanation · nl_summary</text>
+  <line x1="1170" y1="320" x2="650" y2="380" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a2)"/>
+  <line x1="925" y1="320" x2="650" y2="380" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a2)"/>
+</svg>

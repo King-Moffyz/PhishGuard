@@ -1,0 +1,82 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+web_components/
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.svelte-kit/
+.nuxt/
+.docusaurus/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+*.env.*
+
+# Python caches and compiles
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+venv.bak/
+ENV.bak/
+env.bak/
+
+# Testing and coverage
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.hypothesis/
+
+# Machine Learning & Local Data
+training/data/raw/
+training/data/cache/
+*.npz
+
+# IDE and OS files
+.vscode/
+.idea/
+.project
+.classpath
+.settings/
+.DS_Store
+Thumbs.db
+desktop.ini
+.gemini/

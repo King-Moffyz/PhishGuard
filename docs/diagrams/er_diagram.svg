@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 900" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="1300" height="900" fill="#0f172a"/>
+  <text x="650" y="34" text-anchor="middle" fill="#e2e8f0" font-size="20" font-weight="700">Database Entity-Relationship Diagram (migrations/0001_init.sql)</text>
+
+  <g font-size="11">
+  <!-- organisations -->
+  <rect x="40" y="70" width="230" height="150" rx="8" fill="#1e293b" stroke="#60a5fa"/>
+  <text x="155" y="90" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700">organisations</text>
+  <text x="55" y="110" fill="#93c5fd">PK org_id (uuid)</text>
+  <text x="55" y="126" fill="#cbd5e1">name, domain (unique)</text>
+  <text x="55" y="142" fill="#cbd5e1">plan_tier</text>
+  <text x="55" y="158" fill="#cbd5e1">max_processing_latency_ms</text>
+  <text x="55" y="174" fill="#cbd5e1">created_at, updated_at</text>
+
+  <!-- users -->
+  <rect x="330" y="70" width="230" height="150" rx="8" fill="#1e293b" stroke="#60a5fa"/>
+  <text x="445" y="90" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700">users</text>
+  <text x="345" y="110" fill="#93c5fd">PK user_id (uuid)</text>
+  <text x="345" y="126" fill="#cbd5e1">FK org_id → organisations</text>
+  <text x="345" y="142" fill="#cbd5e1">email (uniq per org), full_name</text>
+  <text x="345" y="158" fill="#cbd5e1">role: admin/analyst/viewer/employee</text>
+  <text x="345" y="174" fill="#cbd5e1">hashed_password, is_active</text>
+
+  <!-- email_accounts -->
+  <rect x="40" y="270" width="230" height="150" rx="8" fill="#1e293b" stroke="#60a5fa"/>
+  <text x="155" y="290" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700">email_accounts</text>
+  <text x="55" y="310" fill="#93c5fd">PK account_id (uuid)</text>
+  <text x="55" y="326" fill="#cbd5e1">FK org_id → organisations</text>
+  <text x="55" y="342" fill="#cbd5e1">mailbox_address (uniq/org)</text>
+  <text x="55" y="358" fill="#cbd5e1">display_name, department</text>
+  <text x="55" y="374" fill="#cbd5e1">is_vip, provider</text>
+
+  <!-- email_events -->
+  <rect x="330" y="270" width="260" height="200" rx="8" fill="#164e63" stroke="#22d3ee"/>
+  <text x="460" y="290" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700">email_events</text>
+  <text x="345" y="310" fill="#a5f3fc">PK event_id (uuid)</text>
+  <text x="345" y="326" fill="#cbd5e1">FK account_id → email_accounts</text>
+  <text x="345" y="342" fill="#cbd5e1">sender_address, reply_to_address</text>
+  <text x="345" y="358" fill="#cbd5e1">subject, body_text/html, body_md5</text>
+  <text x="345" y="374" fill="#cbd5e1">raw_headers (jsonb)</text>
+  <text x="345" y="390" fill="#cbd5e1">spf/dkim/dmarc_result</text>
+  <text x="345" y="406" fill="#cbd5e1">received_at, processing_latency_ms</text>
+  <text x="345" y="422" fill="#7dd3fc" font-style="italic">idx: (account_id, body_md5) dedup</text>
+
+  <!-- model_predictions -->
+  <rect x="650" y="230" width="230" height="110" rx="8" fill="#3b0764" stroke="#a855f7"/>
+  <text x="765" y="250" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700">model_predictions</text>
+  <text x="665" y="270" fill="#e9d5ff">PK prediction_id (uuid)</text>
+  <text x="665" y="286" fill="#cbd5e1">FK event_id → email_events</text>
+  <text x="665" y="302" fill="#cbd5e1">model_name, model_version</text>
+  <text x="665" y="318" fill="#cbd5e1">probability_phishing, latency_ms</text>
+
+  <!-- url_records -->
+  <rect x="650" y="360" width="230" height="140" rx="8" fill="#78350f" stroke="#fbbf24"/>
+  <text x="765" y="380" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700">url_records</text>
+  <text x="665" y="400" fill="#fde68a">PK url_id (uuid)</text>
+  <text x="665" y="416" fill="#cbd5e1">FK event_id → email_events</text>
+  <text x="665" y="432" fill="#cbd5e1">raw_url, registered_domain, tld</text>
+  <text x="665" y="448" fill="#cbd5e1">domain_age_days, entropy_score</text>
+  <text x="665" y="464" fill="#cbd5e1">redirect_count, url_risk_score</text>
+
+  <!-- phishing_detections -->
+  <rect x="330" y="520" width="260" height="150" rx="8" fill="#164e63" stroke="#22d3ee"/>
+  <text x="460" y="540" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700">phishing_detections</text>
+  <text x="345" y="560" fill="#a5f3fc">PK detection_id (uuid)</text>
+  <text x="345" y="576" fill="#cbd5e1">FK event_id → email_events (1:1)</text>
+  <text x="345" y="592" fill="#cbd5e1">meta_confidence_score</text>
+  <text x="345" y="608" fill="#cbd5e1">category (enum, 14 values)</text>
+  <text x="345" y="624" fill="#cbd5e1">severity (enum), shap_explanation</text>
+  <text x="345" y="640" fill="#cbd5e1">nl_summary, ground_truth_label</text>
+
+  <!-- alerts -->
+  <rect x="330" y="710" width="260" height="150" rx="8" fill="#064e3b" stroke="#34d399"/>
+  <text x="460" y="730" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700">alerts</text>
+  <text x="345" y="750" fill="#a7f3d0">PK alert_id (uuid)</text>
+  <text x="345" y="766" fill="#cbd5e1">FK detection_id → phishing_detections (1:1)</text>
+  <text x="345" y="782" fill="#cbd5e1">FK org_id → organisations</text>
+  <text x="345" y="798" fill="#cbd5e1">FK assigned_analyst_id → users</text>
+  <text x="345" y="814" fill="#cbd5e1">status (enum), priority_rank</text>
+  <text x="345" y="830" fill="#cbd5e1">analyst_notes, resolved_at</text>
+
+  <!-- response_actions -->
+  <rect x="650" y="710" width="250" height="130" rx="8" fill="#7f1d1d" stroke="#f87171"/>
+  <text x="775" y="730" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700">response_actions</text>
+  <text x="665" y="750" fill="#fecaca">PK action_id (uuid)</text>
+  <text x="665" y="766" fill="#cbd5e1">FK alert_id → alerts</text>
+  <text x="665" y="782" fill="#cbd5e1">action_type (enum)</text>
+  <text x="665" y="798" fill="#cbd5e1">is_automated, success, detail</text>
+  <text x="665" y="814" fill="#cbd5e1">executed_by_user_id → users</text>
+
+  <!-- audit_logs -->
+  <rect x="960" y="70" width="270" height="160" rx="8" fill="#3b0764" stroke="#a855f7"/>
+  <text x="1095" y="90" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700">audit_logs</text>
+  <text x="975" y="110" fill="#e9d5ff">PK log_id (uuid)</text>
+  <text x="975" y="126" fill="#cbd5e1">FK org_id → organisations</text>
+  <text x="975" y="142" fill="#cbd5e1">FK actor_user_id → users</text>
+  <text x="975" y="158" fill="#cbd5e1">action, resource_type/id</text>
+  <text x="975" y="174" fill="#cbd5e1">before_state / after_state (jsonb)</text>
+  <text x="975" y="190" fill="#cbd5e1">prev_hash → entry_hash (sha256 chain)</text>
+  <text x="975" y="206" fill="#cbd5e1">source_ip, created_at</text>
+  </g>
+
+  <!-- relations -->
+  <defs>
+    <marker id="a3" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+  </defs>
+  <line x1="270" y1="145" x2="330" y2="145" stroke="#64748b" stroke-width="1.5" marker-end="url(#a3)"/>
+  <line x1="155" y1="220" x2="155" y2="270" stroke="#64748b" stroke-width="1.5" marker-end="url(#a3)"/>
+  <line x1="270" y1="345" x2="330" y2="345" stroke="#64748b" stroke-width="1.5" marker-end="url(#a3)"/>
+  <line x1="590" y1="320" x2="650" y2="290" stroke="#64748b" stroke-width="1.5" marker-end="url(#a3)"/>
+  <line x1="590" y1="400" x2="650" y2="420" stroke="#64748b" stroke-width="1.5" marker-end="url(#a3)"/>
+  <line x1="460" y1="470" x2="460" y2="520" stroke="#64748b" stroke-width="1.5" marker-end="url(#a3)"/>
+  <line x1="460" y1="670" x2="460" y2="710" stroke="#64748b" stroke-width="1.5" marker-end="url(#a3)"/>
+  <line x1="590" y1="790" x2="650" y2="770" stroke="#64748b" stroke-width="1.5" marker-end="url(#a3)"/>
+  <line x1="445" y1="220" x2="460" y2="710" stroke="#64748b" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#a3)"/>
+  <line x1="560" y1="145" x2="960" y2="145" stroke="#64748b" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#a3)"/>
+
+  <rect x="40" y="860" width="1220" height="34" rx="6" fill="#111827" stroke="#334155"/>
+  <text x="60" y="882" fill="#94a3b8" font-size="12">Solid = FK, cascade delete · Dashed = referential FK without cascade · 1:1 relations: email_events↔phishing_detections, phishing_detections↔alerts</text>
+</svg>

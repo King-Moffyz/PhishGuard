@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 760" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="1240" height="760" fill="#0f172a"/>
+  <text x="620" y="36" text-anchor="middle" fill="#e2e8f0" font-size="22" font-weight="700">AI-Based Phishing Detection System — Architecture</text>
+
+  <!-- Client -->
+  <rect x="40" y="70" width="220" height="90" rx="10" fill="#1e293b" stroke="#475569"/>
+  <text x="150" y="100" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">Mail Gateway / M365</text>
+  <text x="150" y="122" text-anchor="middle" fill="#94a3b8" font-size="12">Raw MIME email ingestion</text>
+  <text x="150" y="140" text-anchor="middle" fill="#94a3b8" font-size="12">source events</text>
+
+  <!-- Frontend -->
+  <rect x="980" y="70" width="220" height="90" rx="10" fill="#1e293b" stroke="#475569"/>
+  <text x="1090" y="100" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">React/TS Dashboard</text>
+  <text x="1090" y="122" text-anchor="middle" fill="#94a3b8" font-size="12">SOC analyst UI (port 3000)</text>
+  <text x="1090" y="140" text-anchor="middle" fill="#94a3b8" font-size="12">Alert queue, SHAP panel</text>
+
+  <!-- FastAPI -->
+  <rect x="420" y="200" width="400" height="100" rx="10" fill="#164e63" stroke="#22d3ee"/>
+  <text x="620" y="230" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="700">FastAPI Backend (app.api.main)</text>
+  <text x="620" y="252" text-anchor="middle" fill="#a5f3fc" font-size="12">/api/v1/emails/analyze  /api/v1/alerts  /api/v1/alerts/{id}/explanation</text>
+  <text x="620" y="272" text-anchor="middle" fill="#a5f3fc" font-size="12">port 8000 · CORS · Pydantic schemas</text>
+  <text x="620" y="290" text-anchor="middle" fill="#67e8f9" font-size="11">docker/backend.Dockerfile</text>
+
+  <!-- Celery worker -->
+  <rect x="420" y="340" width="400" height="110" rx="10" fill="#3b0764" stroke="#a855f7"/>
+  <text x="620" y="368" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="700">Celery Workers (app.workers.tasks)</text>
+  <text x="620" y="390" text-anchor="middle" fill="#e9d5ff" font-size="12">analyze_email task: pipeline → ensemble → persist → auto-response</text>
+  <text x="620" y="408" text-anchor="middle" fill="#e9d5ff" font-size="12">replicas: 2 · task_time_limit 5s · docker/worker.Dockerfile</text>
+  <text x="620" y="428" text-anchor="middle" fill="#c4b5fd" font-size="11">app.ml.pipeline + app.ml.detection_engine</text>
+
+  <!-- Redis -->
+  <rect x="900" y="340" width="300" height="90" rx="10" fill="#7f1d1d" stroke="#f87171"/>
+  <text x="1050" y="370" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="700">Redis 7</text>
+  <text x="1050" y="392" text-anchor="middle" fill="#fecaca" font-size="12">Celery broker + result backend</text>
+  <text x="1050" y="410" text-anchor="middle" fill="#fecaca" font-size="12">port 6379</text>
+
+  <!-- Postgres -->
+  <rect x="420" y="500" width="400" height="110" rx="10" fill="#064e3b" stroke="#34d399"/>
+  <text x="620" y="528" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="700">PostgreSQL 14 (app.db.models)</text>
+  <text x="620" y="550" text-anchor="middle" fill="#a7f3d0" font-size="12">organisations → users, email_accounts → email_events</text>
+  <text x="620" y="568" text-anchor="middle" fill="#a7f3d0" font-size="12">→ model_predictions / url_records → phishing_detections → alerts</text>
+  <text x="620" y="586" text-anchor="middle" fill="#6ee7b7" font-size="11">port 5432 · migrations/0001_init.sql · audit_logs (hash-chained)</text>
+
+  <!-- URL intel microservice -->
+  <rect x="40" y="340" width="300" height="110" rx="10" fill="#78350f" stroke="#fbbf24"/>
+  <text x="190" y="368" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="700">URL / Domain Intelligence</text>
+  <text x="190" y="390" text-anchor="middle" fill="#fde68a" font-size="12">WHOIS age, DNS/MX resolution,</text>
+  <text x="190" y="408" text-anchor="middle" fill="#fde68a" font-size="12">brand-lookalike distance, TLD risk</text>
+  <text x="190" y="426" text-anchor="middle" fill="#fcd34d" font-size="11">app.ml.pipeline (URL feature extraction)</text>
+
+  <!-- ML ensemble box -->
+  <rect x="40" y="500" width="300" height="150" rx="10" fill="#1e3a8a" stroke="#60a5fa"/>
+  <text x="190" y="528" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="700">Hierarchical ML Ensemble</text>
+  <text x="190" y="550" text-anchor="middle" fill="#bfdbfe" font-size="11">L1: RandomForest + XGBoost (tabular)</text>
+  <text x="190" y="568" text-anchor="middle" fill="#bfdbfe" font-size="11">L2: fine-tuned BERT (semantic)</text>
+  <text x="190" y="586" text-anchor="middle" fill="#bfdbfe" font-size="11">L3: IsolationForest + Denoising AE</text>
+  <text x="190" y="604" text-anchor="middle" fill="#bfdbfe" font-size="11">L4: Logistic-Regression meta-learner</text>
+  <text x="190" y="622" text-anchor="middle" fill="#93c5fd" font-size="11">+ SHAP explainability → NL summary</text>
+
+  <!-- arrows -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <line x1="260" y1="115" x2="420" y2="230" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="330" y="165" fill="#94a3b8" font-size="11">raw_mime + account_id</text>
+
+  <line x1="820" y1="250" x2="1090" y2="160" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="900" y="195" fill="#94a3b8" font-size="11">REST JSON</text>
+
+  <line x1="620" y1="300" x2="620" y2="340" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="632" y="322" fill="#94a3b8" font-size="11">.delay() task_id</text>
+
+  <line x1="820" y1="270" x2="900" y2="370" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+  <line x1="900" y1="400" x2="820" y2="400" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="836" y="315" fill="#94a3b8" font-size="11">broker/backend</text>
+
+  <line x1="420" y1="395" x2="340" y2="395" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="345" y="385" fill="#94a3b8" font-size="10">URL lookups</text>
+
+  <line x1="420" y1="425" x2="340" y2="560" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="345" y="480" fill="#94a3b8" font-size="10">inference</text>
+
+  <line x1="620" y1="450" x2="620" y2="500" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="632" y="478" fill="#94a3b8" font-size="11">SQLAlchemy ORM writes</text>
+
+  <line x1="820" y1="560" x2="1090" y2="180" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+  <text x="900" y="640" fill="#94a3b8" font-size="11">alerts / explanations (poll 15s)</text>
+
+  <!-- legend -->
+  <rect x="40" y="690" width="1160" height="46" rx="8" fill="#111827" stroke="#334155"/>
+  <text x="60" y="718" fill="#94a3b8" font-size="12">Solid arrow = synchronous request  ·  Dashed arrow = async / polling  ·  Deployment: docker-compose (postgres, redis, backend, worker x2, frontend)</text>
+</svg>
