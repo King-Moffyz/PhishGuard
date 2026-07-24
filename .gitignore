@@ -20,6 +20,7 @@ out/
 .env.production.local
 *.env
 *.env.*
+!.env.example
 
 # Python caches and compiles
 __pycache__/
