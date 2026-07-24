@@ -169,6 +169,12 @@ def extract_header_features(cleaned: CleanedEmail) -> dict[str, float]:
     spf_pass = 1.0 if "spf=pass" in auth_results else 0.0
     dkim_pass = 1.0 if "dkim=pass" in auth_results else 0.0
     dmarc_pass = 1.0 if "dmarc=pass" in auth_results else 0.0
+    # Distinct from *_pass == 0.0, which is also true when the header is simply absent
+    # (common for internal relays / forwarded mail) — only an explicit "=fail" is real
+    # negative evidence, so callers can tell "known-bad" apart from "unknown".
+    auth_any_fail = 1.0 if any(
+        f"{mech}=fail" in auth_results for mech in ("spf", "dkim", "dmarc")
+    ) else 0.0
 
     sender_domain = cleaned.sender_address.split("@")[-1] if "@" in cleaned.sender_address else ""
     reply_to_domain = cleaned.reply_to_address.split("@")[-1] if "@" in cleaned.reply_to_address else ""
@@ -192,6 +198,9 @@ def extract_header_features(cleaned: CleanedEmail) -> dict[str, float]:
         "dkim_pass": dkim_pass,
         "dmarc_pass": dmarc_pass,
         "auth_all_pass": 1.0 if (spf_pass and dkim_pass and dmarc_pass) else 0.0,
+        # Not one of the 18 trained tabular dims (see HEADER_FEATURE_NAMES) — an extra
+        # signal consumed directly by DetectionEngine's heuristic override.
+        "auth_any_fail": auth_any_fail,
         "reply_to_mismatch": reply_to_mismatch,
         "sender_display_name_mismatch": sender_display_name_mismatch,
         "sender_domain_age_days": float(_domain_age_days(sender_domain)) if sender_domain else -1.0,

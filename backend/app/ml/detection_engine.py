@@ -341,8 +341,12 @@ class DetectionEngine:
         meta_confidence, severity = self.meta_learner.predict(probs_vector)
         latencies["meta_learner"] = (time.perf_counter() - t0) * 1000
 
-        # Heuristic override for authenticated emails with zero phishing indicators
-        is_authenticated = bundle.header_features.get("auth_all_pass", 0.0) > 0
+        # Heuristic override for emails with zero phishing indicators and no evidence of
+        # authentication failure. Missing Authentication-Results (internal relays,
+        # forwarded mail, etc.) is "unknown", not "bad" — only an explicit spf/dkim/dmarc
+        # =fail is treated as negative evidence, otherwise ordinary low-signal business
+        # email gets pushed onto the raw (miscalibrated-on-headerless-mail) ensemble score.
+        not_known_to_fail_auth = bundle.header_features.get("auth_any_fail", 0.0) == 0.0
         has_no_phish_signals = (
             bundle.lexical_features.get("num_urgent_phrases", 0.0) == 0.0 and
             bundle.lexical_features.get("contains_credential_request", 0.0) == 0.0 and
@@ -350,7 +354,7 @@ class DetectionEngine:
             bundle.lexical_features.get("num_links_in_text", 0.0) == 0.0 and
             bundle.header_features.get("sender_display_name_mismatch", 0.0) == 0.0
         )
-        if is_authenticated and has_no_phish_signals:
+        if not_known_to_fail_auth and has_no_phish_signals:
             meta_confidence = 0.05
             severity = Severity.LOW
 
